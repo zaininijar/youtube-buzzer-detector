@@ -17,6 +17,8 @@ import type { Comment, PatternAnalysisResult } from "@/lib/types"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle, Loader2 } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Container } from "@/components/ui/container"
+import { ApiKeyManager } from "@/components/api-key-manager"
 
 export function CommentPatternAnalyzer() {
   const [inputText, setInputText] = useState("")
@@ -116,10 +118,11 @@ export function CommentPatternAnalyzer() {
 
   return (
     <section id="analyzer" className="w-full py-6">
-      <div className="container px-4 md:px-6">
+      <Container>
         <Card className="border-primary/20">
-          <CardHeader>
+          <CardHeader className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <CardTitle className="text-2xl">Analisis Komentar</CardTitle>
+            <ApiKeyManager />
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="manual" className="w-full">
@@ -241,7 +244,7 @@ export function CommentPatternAnalyzer() {
             )}
           </CardContent>
         </Card>
-      </div>
+      </Container>
     </section>
   )
 }

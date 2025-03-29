@@ -1,8 +1,7 @@
 import type { Comment } from "./types"
 
-export async function scrapeYouTubeComments(videoId: string, maxResults = 500): Promise<Comment[]> {
+export async function scrapeYouTubeComments(videoId: string, maxResults = 500, apiKey: string): Promise<Comment[]> {
   try {
-    const apiKey = process.env.YOUTUBE_API_KEY
     let comments: Comment[] = []
     let nextPageToken: string | undefined = undefined
 

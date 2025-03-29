@@ -1,10 +1,11 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { AlertCircle, BarChart2, Users, MessageSquare } from "lucide-react"
+import { Container } from "@/components/ui/container"
 
 export function AboutSection() {
   return (
     <section id="tentang" className="w-full py-12">
-      <div className="container px-4 md:px-6">
+      <Container>
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
           <div className="space-y-2">
             <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">Tentang Buzzer Detector</h2>
@@ -75,7 +76,7 @@ export function AboutSection() {
             </CardContent>
           </Card>
         </div>
-      </div>
+      </Container>
     </section>
   )
 }

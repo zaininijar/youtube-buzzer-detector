@@ -1,9 +1,10 @@
 import { AlertTriangle } from "lucide-react"
+import { Container } from "@/components/ui/container"
 
 export function HeroSection() {
   return (
     <section className="w-full py-6 md:py-12 lg:py-16 xl:py-20">
-      <div className="container px-4 md:px-6">
+      <Container>
         <div className="flex flex-col items-center space-y-4 text-center">
           <div className="inline-block rounded-lg bg-primary/10 p-2 dark:bg-primary/20">
             <AlertTriangle className="h-6 w-6 text-primary" />
@@ -16,7 +17,7 @@ export function HeroSection() {
             sosial
           </p>
         </div>
-      </div>
+      </Container>
     </section>
   )
 }

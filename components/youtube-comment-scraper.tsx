@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
@@ -19,6 +19,36 @@ export function YouTubeCommentScraper({ onCommentsScraped }: YouTubeCommentScrap
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [commentCount, setCommentCount] = useState<number | null>(null)
+  const [hasApiKey, setHasApiKey] = useState(false)
+
+  // Check if API key exists in localStorage and listen for changes
+  useEffect(() => {
+    // Initial check
+    const checkApiKey = () => {
+      const apiKey = localStorage.getItem("youtube_api_key")
+      setHasApiKey(!!apiKey)
+    }
+
+    checkApiKey()
+
+    // Set up event listener for storage changes
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "youtube_api_key") {
+        checkApiKey()
+      }
+    }
+
+    window.addEventListener("storage", handleStorageChange)
+
+    // Custom event for same-tab updates
+    const handleCustomEvent = () => checkApiKey()
+    window.addEventListener("youtube_api_key_changed", handleCustomEvent)
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange)
+      window.removeEventListener("youtube_api_key_changed", handleCustomEvent)
+    }
+  }, [])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setVideoUrl(e.target.value)
@@ -45,6 +75,15 @@ export function YouTubeCommentScraper({ onCommentsScraped }: YouTubeCommentScrap
     setIsLoading(true)
     setCommentCount(null)
 
+    // Get API key from localStorage
+    const apiKey = localStorage.getItem("youtube_api_key")
+
+    if (!apiKey) {
+      setError("YouTube API Key tidak ditemukan. Silakan tambahkan API Key terlebih dahulu.")
+      setIsLoading(false)
+      return
+    }
+
     try {
       const videoId = extractVideoId(videoUrl)
 
@@ -54,8 +93,10 @@ export function YouTubeCommentScraper({ onCommentsScraped }: YouTubeCommentScrap
         return
       }
 
-      // Call our API route to fetch comments with maxResults=500
-      const response = await fetch(`/api/youtube-comments?videoId=${videoId}&maxResults=500`)
+      // Call our API route to fetch comments with maxResults=500 and the API key
+      const response = await fetch(
+        `/api/youtube-comments?videoId=${videoId}&maxResults=500&apiKey=${encodeURIComponent(apiKey)}`,
+      )
 
       if (!response.ok) {
         const errorData = await response.json()
@@ -95,11 +136,15 @@ export function YouTubeCommentScraper({ onCommentsScraped }: YouTubeCommentScrap
               placeholder="https://www.youtube.com/watch?v=..."
               value={videoUrl}
               onChange={handleInputChange}
-              disabled={isLoading}
+              disabled={isLoading || !hasApiKey}
               className="pl-10"
             />
           </div>
-          <Button onClick={handleScrape} disabled={isLoading || !videoUrl.trim()} className="w-full sm:w-auto">
+          <Button
+            onClick={handleScrape}
+            disabled={isLoading || !videoUrl.trim() || !hasApiKey}
+            className="w-full sm:w-auto"
+          >
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -111,6 +156,17 @@ export function YouTubeCommentScraper({ onCommentsScraped }: YouTubeCommentScrap
           </Button>
         </div>
       </div>
+
+      {!hasApiKey && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>API Key Diperlukan</AlertTitle>
+          <AlertDescription>
+            Anda perlu menambahkan YouTube API Key untuk menggunakan fitur ini. Klik tombol "Tambahkan YouTube API Key"
+            di bagian atas.
+          </AlertDescription>
+        </Alert>
+      )}
 
       {error && (
         <Alert variant="destructive">
